@@ -1,1 +1,5 @@
+# Version of the Polkadot node to deploy
+# Format: stable<release number> (e.g. stable2409)
+# This variable is used throughout the playbook to pull the correct Docker image
+# and ensure consistent versioning across all node deployments
 polkadot_version: stable2409

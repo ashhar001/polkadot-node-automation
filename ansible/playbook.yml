@@ -1,7 +1,11 @@
-
+# Main playbook for deploying and updating Polkadot nodes
 - name: Deploy and Update Polkadot Fullnodes
+  # Target the polkadot_nodes group defined in inventory.ini
   hosts: polkadot_nodes
+  # Run tasks with elevated (sudo) privileges
   become: true
+  # Process one host at a time to ensure high availability
   serial: 1
+  # Include all tasks from the deploy-polkadot role
   roles:
     - deploy-polkadot
