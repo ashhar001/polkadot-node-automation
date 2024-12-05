@@ -1,3 +1,4 @@
+
 - name: Install required packages
   yum:
     name: docker
@@ -25,6 +26,11 @@
   args:
     creates: /home/ec2-user/polkadot-data/chains/polkadot/network/secret_ed25519
 
+- name: Stop the Polkadot service before updating
+  systemd:
+    name: polkadot
+    state: stopped
+
 - name: Pull the updated Polkadot Docker image
   docker_image:
     name: "parity/polkadot"
@@ -49,11 +55,11 @@
 - name: Reload systemd to recognize the new service
   command: systemctl daemon-reload
 
-- name: Enable and start the Polkadot systemd service
+- name: Start the Polkadot systemd service with the updated Docker image
   systemd:
     name: polkadot
     enabled: true
-    state: started
+    state: restarted
 
 - name: Wait for the Polkadot service to stabilize
   pause:
