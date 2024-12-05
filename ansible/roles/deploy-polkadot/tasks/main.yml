@@ -31,10 +31,10 @@
     creates: /home/ec2-user/polkadot-data/chains/polkadot/network/secret_ed25519
 
 # Stop the existing Polkadot service before updating
-- name: Stop the Polkadot service before updating
-  systemd:
-    name: polkadot
-    state: stopped
+# - name: Stop the Polkadot service before updating
+#   systemd:
+#     name: polkadot
+#     state: stopped
 
 # Pull the specified version of Polkadot Docker image
 - name: Pull the updated Polkadot Docker image
