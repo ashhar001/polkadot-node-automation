@@ -1,0 +1,30 @@
+[Service]
+User=ec2-user
+Group=docker
+ExecStart=/usr/bin/docker run --rm \
+  -v /home/ec2-user/polkadot-data:/polkadot-data \
+  --network host \
+  -p 9615:9615 -p 30333:30333 -p 9933:9933 -p 9944:9944 \
+  --cap-add=SYS_ADMIN \
+  --security-opt seccomp=unconfined \
+  parity/polkadot:{{ polkadot_version }} \
+  --chain polkadot \
+  --validator \
+  --base-path /polkadot-data \
+  --node-key-file /polkadot-data/chains/polkadot/network/secret_ed25519 \
+  --telemetry-url "wss://telemetry.polkadot.io/submit/ 0" \
+  --rpc-external \
+  --rpc-cors all \
+  --name "polkaval" \
+  --rpc-methods=Unsafe \
+  --prometheus-external \
+  --public-addr /ip4/{{ ansible_host }}/tcp/30333 \
+  --pruning=1000 \
+  --sync=fast \
+  --wasm-execution=Compiled \
+  --db-cache=2048
+Restart=always
+RestartSec=5s
+
+[Install]
+WantedBy=multi-user.target

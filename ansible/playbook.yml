@@ -1,0 +1,7 @@
+
+- name: Deploy and Update Polkadot Fullnodes
+  hosts: polkadot_nodes
+  become: true
+  serial: 1
+  roles:
+    - deploy-polkadot

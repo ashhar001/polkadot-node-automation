@@ -1,0 +1,72 @@
+- name: Install required packages
+  yum:
+    name: docker
+    state: present
+
+- name: Start and enable Docker
+  service:
+    name: docker
+    state: started
+    enabled: true
+
+- name: Create polkadot data directory
+  file:
+    path: /home/ec2-user/polkadot-data
+    state: directory
+    owner: ec2-user
+    group: ec2-user
+
+- name: Generate the node key
+  command: >
+    sudo docker run --rm
+    -v /home/ec2-user/polkadot-data:/polkadot-data
+    parity/polkadot:{{ polkadot_version }}
+    key generate-node-key --base-path /polkadot-data
+  args:
+    creates: /home/ec2-user/polkadot-data/chains/polkadot/network/secret_ed25519
+
+- name: Pull the updated Polkadot Docker image
+  docker_image:
+    name: "parity/polkadot"
+    tag: "{{ polkadot_version }}"
+    source: pull
+
+- name: Ensure correct permissions for node key
+  file:
+    path: /home/ec2-user/polkadot-data/chains/polkadot/network/secret_ed25519
+    owner: ec2-user
+    group: ec2-user
+    mode: '0600'
+
+- name: Copy the systemd service file
+  template:
+    src: polkadot.service.j2
+    dest: /etc/systemd/system/polkadot.service
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Reload systemd to recognize the new service
+  command: systemctl daemon-reload
+
+- name: Enable and start the Polkadot systemd service
+  systemd:
+    name: polkadot
+    enabled: true
+    state: started
+
+- name: Wait for the Polkadot service to stabilize
+  pause:
+    seconds: 30
+
+- name: Verify Polkadot systemd service status
+  shell: systemctl is-active polkadot
+  register: service_status
+  retries: 10
+  delay: 10
+  until: service_status.stdout == "active"
+  changed_when: false
+
+- name: Debug Polkadot service status
+  debug:
+    msg: "Polkadot service is {{ service_status.stdout }}"
