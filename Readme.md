@@ -25,7 +25,6 @@ ansible-playbook -i inventory.ini playbook.yml
 
 ### 3. Rolling Update Workflow
 The playbook uses a rolling update strategy, which means nodes are updated one at a time. This ensures high availability by keeping at least one node running while others are being updated. The process for each node includes:
-- **Stop the Node**: The `systemd` service managing the Polkadot container is stopped.
 - **Pull the New Docker Image**: The updated version of the Polkadot Docker image is pulled.
 - **Update the Systemd Service**: The `systemd` service file is updated to use the new version.
 - **Start the Node**: The Polkadot node is restarted with the new version.
